@@ -1,0 +1,1 @@
+# O-tirano-sem-internet-Bernardo
