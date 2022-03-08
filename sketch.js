@@ -1,175 +1,137 @@
-var Rex, RexCorrendo;
-var chao;
-var chao2;
-var grama;
-var nuvem;
-var nuvemImagem;
-var I1,I2,I3,I4,I5,I6;
-var placar=0;
-var grupoInimigos;
-var grupoNuvens;
-var JOGANDO = 1;
-var ACABOU = 0;
-var estado = JOGANDO;
-var morreu;
-var restart;
-var imagemRestart;
-var gameover;
-var imagemGameover;
-var pular;
-var derrota;
-var checkpoint;
+var otirano, ocorreno;
+var floor, floor_Animation;
+var invisible_floor;
+var fumaca, fumaca_Img;
+var cacto_1, cacto_2, cacto_3, cacto_4, cacto_5, cacto_6;
+var cafe;
+var algodois;
+var verdinhos;
+var INGAME = 1;
+var PERDEUPLAYBOY = 0;
+var estado = INGAME;
+
 
 function preload(){
-RexCorrendo = loadAnimation("trex1.png","trex3.png","trex4.png");
-grama= loadImage('ground2.png');
-nuvemImagem=loadImage('cloud.png');
-I1=loadImage('obstacle1.png');
-I2=loadImage('obstacle2.png');
-I3=loadImage('obstacle3.png');
-I4=loadImage('obstacle4.png');
-I5=loadImage('obstacle5.png');
-I6=loadImage('obstacle6.png');
-morreu=loadAnimation('trex_collided.png');
-imagemRestart=loadImage('restart.png');
-imagemGameover=loadImage('gameOver.png');
-pular=loadSound('jump.mp3');
-derrota=loadSound('die.mp3');
-checkpoint=loadSound('checkPoint.mp3');
-}
 
+ocorreno = loadAnimation("trex1.png", "trex3.png", "trex4.png");
+floor_Animation = loadImage("ground2.png");
+fumaca_Img = loadImage("cloud.png");
+
+cacto_1 = loadImage("obstacle1.png");
+cacto_2 = loadImage("obstacle2.png");
+cacto_3 = loadImage("obstacle3.png");
+cacto_4 = loadImage("obstacle4.png");
+cacto_5 = loadImage("obstacle5.png");
+cacto_6 = loadImage("obstacle6.png");
+
+}
 function setup(){
+
 createCanvas(600,200);
-Rex = createSprite(50, 160, 20, 50);
-Rex.addAnimation("correndo", RexCorrendo);
-Rex.addAnimation('morreu',morreu);
-Rex.scale = 0.5;
+otirano = createSprite(50, 160, 20, 50);
+otirano.addAnimation("correndo", ocorreno);
+otirano.scale = 0.5
+//otirano.frameDelay = 2;
+
+floor = createSprite(200,180,400,20);
+floor.addImage(floor_Animation);
+floor.x = floor.width/2;
+
+invisible_floor = createSprite(200,190,400,10);
+invisible_floor.visible = false;
 
 borda = createEdgeSprites();
-
-chao=createSprite(200,180,400,20);
-chao.addImage('grama',grama);
-chao.x=chao.width/2;
-
-chao2=createSprite(200,190,400,10);
-chao2.visible=false;
-
-var numero = Math.round(random(1, 100));
-console.log(numero);
-
-grupoInimigos = new Group();
-grupoNuvens = new Group();
-
-//Rex.debug = true;
-Rex.setCollider("circle",0,0,40);
-
-/*gameover=createSprite(300,100);
-gameover.addImage(imagemGameover);
-restart=createSprite(300,150);
-restart.addImage(imagemRestart);
-restart.scale=0.8;*/
-
-
+cafe = 0;
+//Como criar números aleatórios
+//var roleta = Math.round(random(1,100));
+//console.log(roleta);
+algodois = new Group();
+verdinhos = new Group();
 }
-
 function draw(){
-background("white");
-//console.log(Rex.y);
-console.log("estado do jogo:"+estado);
+    background("#e6e6e6");
 
-if(estado === JOGANDO){
-    chao.velocityX=-2;
-    if(keyDown("space")&&Rex.y>=155){
-        Rex.velocityY = -12;
-        pular.play();
+    //console.log(otirano.y);
+
+if(estado === INGAME){
+    floor.velocityX = -2;
+
+} else if(estado === PERDEUPLAYBOY){
+    floor.velocityX = 0;
+}
+
+
+
+
+if(floor.x < 0 ){
+    floor.x = floor.width/2;
+}
+
+if(keyDown("space")&& otirano.y >= 140){
+    otirano.velocityY = -10;
+
+}
+
+otirano.velocityY += 1;
+otirano.collide(invisible_floor);
+
+algodao();
+verdinho();
+drawSprites();
+
+text("Score : " + cafe,500,50); 
+cafe += Math.round(frameCount/60);
+//Desenhar grade
+/*for (var i  = 0; i <= 600; i+=50){
+    line(i,0,i,200);  
     }
-if(chao.x<0){
-    chao.x=chao.width/2;
-}
-Rex.velocityY += 1;
-placar+=Math.round(frameCount/60);
-nuvens();
-inimigos();
-if(grupoInimigos.isTouching(Rex)){
-    estado=ACABOU;
-    derrota.play();
-}
-if(placar > 0 && placar % 100 === 0){
-    checkpoint.play();
+
+for (var j  = 0; j <= 200; j+=50){
+    line(0,j,600,j);  
+    }*/
 }
 
-
-
+function algodao(){
+    if(frameCount%60 === 0){
+        fumaca = createSprite(600,100,40,10);
+        fumaca.velocityX = -3;
+        fumaca.addImage(fumaca_Img);
+        fumaca.scale = random(0.5,1);
+        fumaca.y = Math.round(random(10,100));
+        fumaca.depth = otirano.depth;
+        otirano.depth += 1;
+        fumaca.lifetime = 250;
+        algodois.add(fumaca);
+    }
 
     
-} else if (estado === ACABOU){
-    Rex.changeAnimation("morreu");
-chao.velocityX=0;
-Rex.velocityY=0;
-grupoInimigos.setVelocityXEach(0);
-grupoNuvens.setVelocityXEach(0);
-grupoInimigos.setLifetimeEach(-1);
-grupoNuvens.setLifetimeEach(-1);
 }
 
-
-
-
-
-
-Rex.collide(chao2);
-
-
-
-drawSprites();
-textSize(15);
-textFont('Courier New');
-text(placar,500,50);
-
-
-
-}
-
-function nuvens(){
-    if(frameCount%60===0){
-        nuvem=createSprite(600,100,40,10);
-        nuvem.addImage(nuvemImagem);
-        nuvem.y=Math.round(random(1,120));
-        nuvem.scale=0.6
-        nuvem.velocityX=-3;
-
-        nuvem.lifetime = 250;
-
-        nuvem.depth=Rex.depth;
-        Rex.depth+=1;
-
-        grupoNuvens.add(nuvem);
+function verdinho(){
+if(frameCount%60 === 0){
+    var cacto = createSprite(600,165,10,40);
+    cacto.velocityX = -6; 
+    var surprise = Math.round(random(1,6));
+    switch (surprise) {
+        case 1: cacto.addImage(cacto_1);
+        break;
+        case 2: cacto.addImage(cacto_2);
+        break;
+        case 3: cacto.addImage(cacto_3);
+        break;
+        case 4: cacto.addImage(cacto_4);
+        break;
+        case 5: cacto.addImage(cacto_5);
+        break;
+        case 6: cacto.addImage(cacto_6);
+        break;
+    
+        default:
+            break;
     }
- 
+    cacto.scale = 0.5;
+    cacto.lifetime = 300;
+    verdinhos.add(cacto);
 }
-function inimigos(){
-    if(frameCount%60===0){
-        var inimigo=createSprite(600,165,10,40);
-        inimigo.velocityX=-6;
-        var x=Math.round(random(1,6));
-        switch(x){
-            case 1:inimigo.addImage(I1);
-            break;
-            case 2:inimigo.addImage(I2);
-            break;
-            case 3:inimigo.addImage(I3);
-            break;
-            case 4:inimigo.addImage(I4);
-            break;
-            case 5:inimigo.addImage(I5);
-            break;
-            case 6:inimigo.addImage(I6);
-            break;
-            default:break;
-        }
-        inimigo.scale=0.5;
-        inimigo.lifetime=300;
 
-        grupoInimigos.add(inimigo);
-    }
 }
