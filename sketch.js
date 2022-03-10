@@ -8,8 +8,9 @@ var algodois;
 var verdinhos;
 var INGAME = 1;
 var PERDEUPLAYBOY = 0;
-var estado = INGAME;
+var estado;
 
+estado = INGAME;
 
 function preload(){
 
@@ -47,45 +48,52 @@ cafe = 0;
 //console.log(roleta);
 algodois = new Group();
 verdinhos = new Group();
+otirano.debug = false;
+otirano.setCollider("circle", 0, 0, 40);
 }
 function draw(){
     background("#e6e6e6");
-
+    otirano.collide(invisible_floor);
     //console.log(otirano.y);
 
 if(estado === INGAME){
     floor.velocityX = -2;
+    otirano.velocityY += 1;
+
+    algodao();
+    verdinho();
+
+    cafe += Math.round(frameCount/60);
+    
+    if(floor.x < 0 ){
+        floor.x = floor.width/2;
+    }
+
+    if(keyDown("space")&& otirano.y >= 140){
+        otirano.velocityY = -10;
+    }
+
+    if(verdinhos.isTouching(otirano)){
+        estado = PERDEUPLAYBOY;
+
+    }
 
 } else if(estado === PERDEUPLAYBOY){
     floor.velocityX = 0;
-}
-
-
-
-
-if(floor.x < 0 ){
-    floor.x = floor.width/2;
-}
-
-if(keyDown("space")&& otirano.y >= 140){
-    otirano.velocityY = -10;
+    algodois.setVelocityXEach(0);
+    verdinhos.setVelocityXEach(0);
 
 }
 
-otirano.velocityY += 1;
-otirano.collide(invisible_floor);
 
-algodao();
-verdinho();
 drawSprites();
 
 text("Score : " + cafe,500,50); 
-cafe += Math.round(frameCount/60);
+
 //Desenhar grade
 /*for (var i  = 0; i <= 600; i+=50){
     line(i,0,i,200);  
     }
-
 for (var j  = 0; j <= 200; j+=50){
     line(0,j,600,j);  
     }*/
