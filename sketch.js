@@ -1,4 +1,4 @@
-var otirano, ocorreno;
+var otirano, ocorreno, omorreno;
 var floor, floor_Animation;
 var invisible_floor;
 var fumaca, fumaca_Img;
@@ -9,6 +9,8 @@ var verdinhos;
 var INGAME = 1;
 var PERDEUPLAYBOY = 0;
 var estado;
+var restart, restartImg;
+var gameOver, gameOverImg;
 
 estado = INGAME;
 
@@ -17,6 +19,9 @@ function preload(){
 ocorreno = loadAnimation("trex1.png", "trex3.png", "trex4.png");
 floor_Animation = loadImage("ground2.png");
 fumaca_Img = loadImage("cloud.png");
+omorreno = loadAnimation("trex_collided.png");
+restartImg = loadImage("restart.png");
+gameOverImg = loadImage("gameOver.png");
 
 cacto_1 = loadImage("obstacle1.png");
 cacto_2 = loadImage("obstacle2.png");
@@ -31,8 +36,17 @@ function setup(){
 createCanvas(600,200);
 otirano = createSprite(50, 160, 20, 50);
 otirano.addAnimation("correndo", ocorreno);
+otirano.addAnimation("morrendo", omorreno);
 otirano.scale = 0.5
 //otirano.frameDelay = 2;
+
+gameOver = createSprite(300,100);
+gameOver.addImage(gameOverImg);
+gameOver.scale = 0.7;
+
+restart = createSprite(300,140);
+restart.addImage(restartImg);
+restart.scale = 0.5;
 
 floor = createSprite(200,180,400,20);
 floor.addImage(floor_Animation);
@@ -59,6 +73,8 @@ function draw(){
 if(estado === INGAME){
     floor.velocityX = -2;
     otirano.velocityY += 1;
+    gameOver.visible = false;
+    restart.visible = false;
 
     algodao();
     verdinho();
@@ -82,7 +98,12 @@ if(estado === INGAME){
     floor.velocityX = 0;
     algodois.setVelocityXEach(0);
     verdinhos.setVelocityXEach(0);
-
+    otirano.changeAnimation("morrendo");
+    algodois.setLifetimeEach(-1);
+    verdinhos.setLifetimeEach(-1);
+    otirano.velocityY = 0;
+    restart.visible = true;
+    gameOver.visible = true;
 }
 
 
