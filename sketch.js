@@ -13,6 +13,7 @@ var restart, restartImg;
 var gameOver, gameOverImg;
 var sheeeeesh, ping, pirin;
 var mensagem = "Hoje não choveu aqui";
+var pulso = true;
 
 estado = INGAME;
 
@@ -39,26 +40,26 @@ pirin = loadSound("checkPoint.mp3");
 }
 function setup(){
 
-createCanvas(600,200);
-otirano = createSprite(50, 160, 20, 50);
+createCanvas(windowWidth,windowHeight);
+otirano = createSprite(50, height-70, 20, 50);
 otirano.addAnimation("correndo", ocorreno);
 otirano.addAnimation("morrendo", omorreno);
 otirano.scale = 0.5
 //otirano.frameDelay = 2;
 
-gameOver = createSprite(300,100);
+gameOver = createSprite(width/2,height/2-50);
 gameOver.addImage(gameOverImg);
 gameOver.scale = 0.7;
 
-restart = createSprite(300,140);
+restart = createSprite(width/2,height/2);
 restart.addImage(restartImg);
 restart.scale = 0.5;
 
-floor = createSprite(200,180,400,20);
+floor = createSprite(width/2,height-80,width,125);
 floor.addImage(floor_Animation);
 floor.x = floor.width/2;
 
-invisible_floor = createSprite(200,190,400,10);
+invisible_floor = createSprite(width/2,height-10,width,125);
 invisible_floor.visible = false;
 
 borda = createEdgeSprites();
@@ -94,15 +95,20 @@ if(estado === INGAME){
     algodao();
     verdinho();
 
-    cafe += Math.round(frameCount/60);
+    cafe += Math.round(frameRate()/60);
     
     if(floor.x < 0 ){
         floor.x = floor.width/2;
     }
 
-    if(keyDown("space")&& otirano.y >= 140){
-        otirano.velocityY = -10;
+    if(keyWentDown("space")&& otirano.y >= height-140 && pulso === false || touches.length > 0 && otirano.y >= height-140){
+        otirano.velocityY = -12;
+        pulso = true;
         ping.play();
+        touches = [];
+    }
+    if(keyWentUp("space")){
+        pulso = false;
     }
 
     if(verdinhos.isTouching(otirano)){
@@ -120,15 +126,19 @@ if(estado === INGAME){
     otirano.velocityY = 0;
     restart.visible = true;
     gameOver.visible = true;
+
+        if(mousePressedOver(restart) || touches.length > 0){
+          reset();
+          touches = [];
+        
+    }
 }
 
-if(mousePressedOver(restart)){
-    reset();
-}
+
 
 drawSprites();
 
-text("Score : " + cafe,500,50); 
+text("Score : " + cafe,width-100,height/2); 
 
 //Desenhar grade
 /*for (var i  = 0; i <= 600; i+=50){
@@ -141,15 +151,22 @@ for (var j  = 0; j <= 200; j+=50){
 
 function reset(){
     
+   estado = INGAME;
+
+   cafe = 0;
+   
+   verdinhos.destroyEach();
+   algodois.destroyEach();
+   otirano.changeAnimation("correndo");
 }
 
 function algodao(){
     if(frameCount%60 === 0){
-        fumaca = createSprite(600,100,40,10);
+        fumaca = createSprite(width+20,height-300,40,10);
         fumaca.velocityX = -3;
         fumaca.addImage(fumaca_Img);
         fumaca.scale = random(0.5,1);
-        fumaca.y = Math.round(random(10,100));
+        fumaca.y = Math.round(random(10,height/2));
         fumaca.depth = otirano.depth;
         otirano.depth += 1;
         fumaca.lifetime = 250;
@@ -161,7 +178,7 @@ function algodao(){
 
 function verdinho(){
 if(frameCount%60 === 0){
-    var cacto = createSprite(600,165,10,40);
+    var cacto = createSprite(width,height-95,10,40);
     cacto.velocityX = -(6 + cafe / 100); 
     var surprise = Math.round(random(1,6));
     switch (surprise) {
